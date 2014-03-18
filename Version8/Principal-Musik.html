@@ -1,0 +1,90 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>My Musik</title>
+<script language="javascript" type="text/javascript" src="Reproductor.js"></script>
+<script language="javascript" type="text/javascript" src="PlayPause.js"></script>
+<script language="javascript" type="text/javascript" src="BarraProgreso.js"></script>
+<script language="javascript" type="text/javascript" src="BarraVolumen.js"></script>
+<script language="javascript" type="text/javascript" src="ListadoCancion.js"></script>
+<link rel="stylesheet" href="Estilos.css" />
+
+<script type="text/javascript">
+	
+
+/*CLASE SIGUIENTE CANCION 
+====================================
+*/ 
+
+
+function inicioPorDefectoBarra()
+   { barraProgreso.getBarra(); 
+     barraVolumen.getVolumen(); 
+   } 
+//Este acontecimiento queda despedido cuando una página tiene loaded
+window.addEventListener("DOMContentLoaded", inicioPorDefectoBarra, false);
+</script>
+</head>
+
+<body>
+<div class="contenedor">
+    <div class="logo">
+      <h3>Mi Reproductor html5</h3>
+    </div>
+     <audio id="miAudio">
+         <source id="rutaCancion"/> 
+     </audio>
+     <button id="play" onclick="presionarPlay.getPlay()">
+     Play
+     </button>
+     
+     <button id="anteriorC" onclick="barraProgreso.ponerBarraEnCero('miAudio')"">
+     Anterior
+     </button>
+     <button id="siguienteC" onclick="barraProgreso.ponerBarraEnCero('miAudio')">
+     Siguiente
+     </button>
+     <button id="ponerEnCero" onclick="barraProgreso.ponerBarraEnCero('miAudio')">
+     Volver
+     </button> 
+     <script>
+	 barraProgreso.contarDesplazamiento();
+	 </script>    
+     <p>
+       <canvas id="canvas" width="500" height="5">
+       </canvas>
+     </p>
+     <p>
+     <button id="bajarV" onclick="barraVolumen.bajarVolumen('miAudio')">
+     -
+     </button>
+       <canvas id="canvasVolumen" width="200" height="5">
+       </canvas>
+       <button id="aumentarV" onclick="barraVolumen.aumentarVolumen('miAudio')">
+     +
+     </button>
+     </p> 
+     <div align="center">   
+      <select size="24" style="border-color:#F00 !important" id = "selectTrack" multiple onChange="reproducirListadoCancion.setListado(this.options[this.selectedIndex]);">
+          <option path="../music/147 - TABACO Y RON - RODOLFO Y SU TIPICA.mp3">01. TABACO Y RON - RODOLFO Y SU TIPICA******</option>
+          <option path="../music/04. Estoy loco por tu amor.mp3">02. Estoy loco por tu amor</option>
+          <option path="../music/02 - Lovegame.mp3">03. Lovegame</option>
+          <option path="../music/02_mariposas95.mp3">04. Mariposas</option>
+          <option path="../music/03 - It's My Life.mp3">05. It's My Life</option>
+          <option path="../music/03 - Nickelback - Gotta Be Somebody.mp3">06. Rock 'N Roll Train</option>
+          <option path="../music/03 - Nickelback - Gotta Be Somebody.mp3">07. Adit - Aaj Ei Akash (Ost of the film Porinoti)</option>
+          <option path="../music/03 - Nickelback - Gotta Be Somebody.mp3">08. La de la Mala Suerte</option>
+          <option path="../music/03 - Nickelback - Gotta Be Somebody.mp3">09. PERDONAME</option>
+          <option path="../music/03 - Nickelback - Gotta Be Somebody.mp3">10. Gotta Be Somebody</option>
+          <option path="../music/enomine.mp3">11. E nomine</option>
+       </select>
+       <script>
+        reproducirListadoCancion.getListado();
+       </script>
+       </div>
+ <div id="pie" align="center">
+ <h1>MUSIK.COM</h1>
+ </div>
+</div>
+</body>
+</html>

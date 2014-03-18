@@ -1,0 +1,22 @@
+<!DOCTIPE html>
+<html lang="es">
+<head>
+   <script language="javascript" type="text/javascript" src="funcionesReproductor.js"></script>
+</head>
+<body>
+   <div id="reproductorBox">
+   </div>
+   <select  id = "selectTrack" multiple onChange="cambiarTrack(this.options[this.selectedIndex]);">
+      <option path="../music/04. Estoy loco por tu amor.mp3">Estoy loco por tu amor</option>
+      <option path="../music/02 - Lovegame.mp3">Lovegame</option>
+      <option path="../music/02_mariposas95.mp3">Mariposas</option>
+      <option path="../music/03 - It's My Life.mp3">It's My Life</option>
+      <option path="../music/03 - Nickelback - Gotta Be Somebody.mp3">Gotta Be Somebody</option>
+      <option path="../music/enomine.mp3">E nomine</option>
+   </select>
+   <script>
+   cargarReproductor();
+   </script>
+</body>
+</html>
+

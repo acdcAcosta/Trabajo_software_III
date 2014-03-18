@@ -1,0 +1,50 @@
+@charset "utf-8";
+/* CSS Document */
+body {
+	background:
+	margin: 0;
+	padding: 0;
+	background: #000;
+	text-align: justify;
+	font: 13px "Trebuchet MS", Arial, Helvetica, sans-serif;
+	color: #FFF;
+	scrollbar-arrow-color: #0066CC;
+	scrollbar-arrow-color: #999999;
+	scrollbar-base-color: #242424;
+	scrollbar-dark-shadow-color: #1F1F1F;
+	scrollbar-track-color: #272727;
+	scrollbar-face-color: #191919;
+	scrollbar-shadow-color: #121212;
+	scrollbar-highlight-color: #313131;
+	scrollbar-3d-light-color: #242424; 
+}
+div.contenedor {
+background: linear-gradient(to bottom, #93C 0%, #C6F 12%, #FFF 25%, #FFF 41%,#FFF 50%,#FFF 60%, #FFF 76%,#FFF 91%, #000 100%); 
+border: 5px double #F05;
+    border-radius: 50px 50px 50px 50px;
+    height: 620px;
+    margin: 0 auto;
+    overflow: hidden;
+    padding: 0 30px;
+    width: 500px;
+
+}
+#canvas  
+   {   margin-top: 10px; 
+       border-style:solid; 
+       border-width:1px;
+	   background:#FFFBF0;
+	   padding:0px;
+	   font-size:.8em;	
+	   background-color:#eee;
+       border:1px solid #F05;	
+   }
+#canvasVolumen  
+   { margin-top:10px; 
+     border-style:solid; 
+	 background:#FFFBF0;
+     border-width:1px; 
+     padding:0px; 
+	 font-size:.8em;	
+   }
+.class

@@ -1,0 +1,174 @@
+[color=#000000][color=#000000] 
+<!DOCTYPE html> 
+<html> 
+<head> 
+<title>Insert title here</title> 
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script> 
+<script> 
+var player = false; 
+var canvas = false; 
+var context = false; 
+var paused = false; 
+  
+var updateCanvas = function(percent){ 
+    //Obtenemos la anchura del canvas 
+    var w = canvas.width * percent / 100; 
+  
+    //Dibujamos un rectángulo relleno de blanco (limpiamos la imagen) 
+    context.fillStyle = "#76D4D0"; 
+    context.fillRect(0, 0, canvas.width, canvas.height); 
+  
+    //Dibujamos un rectángulo de relleno gris 
+    context.fillStyle = "#DDE075"; 
+    context.fillRect(0, 0, w, canvas.height); 
+  
+
+} 
+  
+var canvasClicked = function(event){ 
+    //Hacemos una regla de tres para colocar el timer del reproductor 
+    //en un tiempo directamente proporcional a la zona que hemos pinchado 
+    player.currentTime = player.duration * event.offsetX / canvas.width; 
+} 
+  
+//Convierte segundos (double) a hh:mm:ss 
+var toHMS = function(it){ 
+    if(isNaN(it)){ 
+        return "00:00:00"; 
+    } 
+  
+    var hours = parseInt(it / 3600); 
+    var minutes = parseInt((it % 3600) / 60); 
+    var seconds = parseInt((it % 3600) % 60); 
+  
+    return ((hours<10?"0"+hours:hours) + ":" + (minutes<10?"0"+minutes:minutes) + ":" + (seconds<10?"0"+seconds:seconds)); 
+} 
+  
+var pause = function(){ 
+    //Pausamos la reproducción 
+    player.pause(); 
+    paused = true; 
+  
+    //Escondemos el pause y mostramos el play 
+    $('#pause').hide(); $('#play').show(); 
+} 
+  
+var play = function(){ 
+    //Iniciamos la reproducción 
+    player.play(); 
+    paused = false; 
+  
+    //Escondemos el play y mostramos el pause 
+    $('#play').hide(); $('#pause').show(); 
+} 
+  
+var updateTimes = function(){ 
+    //Actualizamos el display de tiempo transcurrido 
+    $('#currentTime').html(toHMS(player.currentTime)); 
+      
+    //La línea se rellenará con el porcentaje de tiempo transcurrido 
+    updateCanvas(parseInt(player.currentTime * 100 / player.duration));     
+} 
+  
+var addVol = function(inc){ 
+    //Añadimos un incremento al volumen actual 
+    player.volume+= inc; 
+  
+    //Actualizamos el display de volumen 
+    $('#vol').html(parseInt(player.volume*100)); 
+} 
+  
+// 
+var init = function(){ 
+    //Inicializamos el player 
+    player = document.getElementById('player'); 
+  
+    //Asociamos eventos a los botones de play y pause 
+    $('#play').click(play); 
+    $('#pause').click(pause); 
+    $('#volUp').click(function() { addVol(0.1) } ); 
+    $('#volDown').click(function(){ addVol(-0.1) }); 
+  
+    //Definimos la duración de la pista de audio, así como el valor del volumen (de 0 a 100) 
+    $('#duration').html(toHMS(player.duration)); 
+    $('#vol').html(parseInt(player.volume*100)); 
+  
+    //Actualizamos cada 100ms 
+    setInterval(function(){ updateTimes(); }, 100); 
+  
+    //Inicializamos el canvas 
+    canvas = document.getElementById('timer');  
+    $('#timer').click(canvasClicked); 
+    context = canvas.getContext('2d'); 
+}; 
+  
+$(document).ready(function(){ 
+    $('.audio_control').click(function(event){ 
+        event.preventDefault(); //Evitamos que se mueva la ventana al hacer clic en los enlaces 
+    }); 
+  
+    $('#player').bind('loadedmetadata', init); //Lanzamos la función init cuando se hayan cargado los metadatos 
+  
+}); 
+</script> 
+<style> 
+    @font-face { 
+        font-family: "Arizonia"; 
+        src: url('497741700-Arizonia-Regular.eot'); 
+        src: url('497741700-Arizonia-Regular.eot?#iefix') format('embedded-opentype'), 
+        url('497741700-Arizonia-Regular.svg#Arizonia') format('svg'), 
+        url('497741700-Arizonia-Regular.woff') format('woff'), 
+        url('497741700-Arizonia-Regular.ttf') format('truetype'); 
+        font-weight: normal; 
+        font-style: normal; 
+    } 
+    body{ 
+    font-family: "Arizonia"; 
+    direction: ltr; 
+   -moz-box-shadow:  25px -24px 100px -13px rgba(247, 242, 173, 79), 9px 12px 6px 13px #333333;  
+text-decoration: none: 
+    } 
+audio { 
+display: none; 
+} 
+canvas { 
+ border-radius: 64px 52px 76px 93px;  
+} 
+span { 
+
+
+  -moz-box-shadow:  -5px -14px 100px -5px rgba(247, 242, 173, 79), 2px 2px 2px 2px #333333;  
+ box-shadow: inset  -5px -14px 100px -5px rgba(247, 242, 173, 9), 2px 2px 2px 2px #333333;  
+ border-radius: 64px 52px 76px 93px;  
+  
+ word-wrap: break-word; 
+moz-transition: 3s; 
+transition: 3s; 
+padding-bottom: 3px; 
+padding-left: 7px; 
+padding-right: 5px; 
+padding-top:: 2px;  
+border: 1px dotted; 
+margin: 4px; 
+animation: portada 5s; 
+
+    } 
+
+img { 
+width: 55px; 
+height: 55px; 
+} 
+</style> 
+</head> 
+<body> 
+<a href="#" id="play" class="audio_control" ><img src="http://openclipart.org/people/diamonjohn/playbutton.svg"></a> 
+<a href="#" id="pause" class="audio_control" style=display:none><img src="http://openclipart.org/people/Anonymous/player_pause.svg"></a> 
+<span id="currentTime">00:00:00</span> <span>/</span> <span id="duration">00:00:00</span> <a href="#" id="volUp" class="audio_control"><img src="http://openclipart.org/people/mightyman/volume3_2.svg"></a> <span id="vol"></span> <a href="#" id="volDown" class="audio_control"><img src="http://openclipart.org/people/mightyman/volume0_2.svg"></a> 
+<audio id="player" preload="auto" controls> 
+    <source src="../music/02 - Lovegame.mp3"></source> 
+    <!-- Si tuviésemos la fuente en ogg, la pondríamos aquí --> 
+</audio> 
+<canvas id="timer" width="500" height="80"></canvas> 
+</body> 
+</html> 
+[/color][/color]

@@ -1,0 +1,99 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Untitled Document</title>
+<link rel="stylesheet" href="musikEstilo.css" />
+<script type="text/javascript" src="jquery.min.js"></script>
+<script type="text/javascript" src="jquery-ui.min.js"></script>
+<script language="javascript" type="text/javascript" src="funcionesReproductor.js"></script>
+</head>
+<body>
+<div class="contenedor">
+    <audio preload="auto" autobuffer controls id="audio">
+        <source src="music/03 - Nickelback - Gotta Be Somebody.mp3" />
+        <source src="music/02_mariposas95.mp3"/>
+    </audio>
+    <div class="audiocontrols">
+    <h3>Mi Reproductor html5</h3>
+        <div class="reproduccion">
+            <a href="#" class="play"><i class="icon-play"></i></a>
+            <a href="#" class="pause"><i class="icon-pause"></i></a>
+            <a href="#" class="stop"><i class="icon-stop"></i></a>
+        </div>
+        <div class="volume">
+            <a href="#" class="down"><i class="icon-volume-down"></i></a>
+            <div class="slider"><span class="knob"></span></div>
+            <a href="#" class="up"><i class="icon-volume-up"></i></a>
+        </div>
+    </div>    
+</div>
+         <div id="reproductorBox">
+         </div>
+         <select  id = "selectTrack" multiple onchange="cambiarTrack(this.options[this.selectedIndex]);">
+          <option path="../music/04. Estoy loco por tu amor">Der Exorzist</option>
+          <option path="music\02 - Lovegame.mp3">Lovegame</option>
+          <option path="music\02_mariposas95.mp3">Mariposas</option>
+          <option path="music\03 - It's My Life.mp3">It's My Life</option>
+          <option path="music\03 - Nickelback - Gotta Be Somebody.mp3">Gotta Be Somebody</option>
+          <option path="music\enomine.mp3">E nomine</option>
+          <option path="music\04. Estoy loco por tu amor.mp3">Estoy loco por tu amor</option>
+       </select>
+   <script>cargarReproductor();</script>
+
+<script type="text/javascript">
+(function($){
+	//Aqui reproducimos el audio
+    var audio = document.getElementById('audio');
+    $('.audiocontrols a.play').on('click',function(e){
+        e.preventDefault();
+        audio.play();
+    });
+    $('.audiocontrols a.pause').on('click',function(e){
+        e.preventDefault();
+        audio.pause();
+    });
+    $('.audiocontrols a.stop').on('click',function(e){
+        e.preventDefault();
+        audio.pause();
+        audio.currentTime=0;
+    });
+	
+//------------  Fin controles de audio ------------ //
+
+//------------ Controlar el Volumen --------------- //
+ 
+    $('.down').on('click',function(e){
+        e.preventDefault(); 
+        audio.volume=Math.max(audio.volume-0.1,0);
+    });
+    $('.up').on('click',function(e){
+        e.preventDefault(); 
+        audio.volume=Math.min(audio.volume+0.1,1);
+    });
+ 
+    $(".knob").draggable({
+        containment:"parent",
+        drag:function(evt,ui){
+            var newVol = Math.round(ui.position.left / $(this).parent().width()*10) / 10;
+            audio.volume=newVol;		
+        }
+        });
+ 
+    $('.slider').on('click',function(e){
+        if(!$(e.target).hasClass('slider'))return;
+        var newVol = Math.round(e.offsetX/ $(this).width()*10) / 10;
+        audio.volume=newVol;    
+    });
+ 
+    $(audio).on('volumechange',function(){
+        $('.knob').css('left',Math.min(audio.volume*$('.knob').parent().width(),$('.knob').parent().width()-$('.knob').width())+'px');
+        localStorage.setItem('volume',audio.volume);
+    });
+ 
+    audio.volume=(localStorage.getItem('volume')||1);
+    $(audio).trigger('volumechange');
+})(jQuery);
+</script>
+</body>
+</html>

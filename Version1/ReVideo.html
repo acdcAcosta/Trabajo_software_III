@@ -1,0 +1,219 @@
+<html>
+    <head>
+        <title></title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <style>
+            #canvasControles {
+                position: absolute;
+                box-shadow: 0px 0px 10px #000;
+            }
+            #canvasVideo {
+                position: absolute;
+            }
+        </style>
+        
+       
+    </head>
+    
+    <body style="background-color: #AAA">
+        <noscript>
+        No tiene habilitado JavaScript.
+        </noscript>
+       
+         <script>
+             var canvasVideo, ctxVideo, video;
+             var canvasControles, ctxControles, controles;
+             var xPoint, yPoint, down;
+             
+             window.addEventListener('load', function () {
+               if (!hayCanvas()){
+                   alert("Tu navegador no soporta canvas");
+               }
+               video = document.createElement("video");
+               if (video == null){
+                   alert("Tu navegador no soporta este video");
+               }
+               canvasVideo = document.getElementById("canvasVideo");
+               canvasControles = document.getElementById("canvasControles");
+               ctxVideo = canvasVideo.getContex("2d");
+               ctxControles = canvasControles.getContex("2d");
+               video.src = "hola.mp4";
+               video.addEventListener('loadedmetadata', function (){
+                  canvasVideo.width = canvasControles.width = video.videoWidth;
+                  canvasVideo.height = canvasControles.heigth = video.videoHeight;     
+               });
+               video.addEventListener('canplay', function (){
+                 setInterval(paintVideo,33);
+                 setInterval(paintControles,11);
+               });
+               
+               //Añadir botones al array controles
+               var play = new Boton(pintarPlay, playMouse);
+               var mute = new Boton(pintarMute, muted);
+               controles = [play, mute];
+               
+               
+               canvasControles.addEventListener("mousedown", mouseDown);
+               canvasControles.addEventListener("mouseup", mouseUp);
+               canvasControles.addEventListener("mouseout", mouseUp);
+               canvasControles.addEventListener("mousemove", movePoint);
+             });
+             
+             function paintVideo(){
+                 ctxVideo.drawImage(video, 0, 0, canvasVideo.width, canvasVideo.height);
+             }
+             
+             function paintControles(){
+                 ctxControles.clearRect(0, 0, canvasControles.width,canvasControles.heigth);
+                 for(var i = 0; i < controles.length; i++){
+                     controles[i].mover();
+                     if(down && (controles[i].x-xPoint)*(controles[i].x-xPoint)+
+                         (controles[i].y-yPoint)*(controles[i].y-yPoint)
+                         <= controles[i].r*controles[i].r){
+                         controles[i].accion();
+                         down = false;
+                     }
+                     controles[i].estilo(ctxControles);
+                 }
+             }
+             
+             function mouseDown(e) {
+                 down = true;
+                 movePoint(e);
+             }
+             function mouseUp(e) {
+                 down = false;
+             }
+             
+             function movePoint(e) {
+                 var ie = navigator.userAgent.toLowerCase().indexOf('msie')!=-1;
+                 if(ie) {
+                     e = windown.event;
+                     e.pageX = e.clientX+windown.pageXOffset;
+                     e.pageY = e.clientY+windown.pageYOffset;
+                 }
+                 xPoint = e.pageX-canvasControles.offsetLeft;
+                 yPoint = e.pageY-canvasControles.offsetTop;
+             }
+             function hayCanvas(){
+                 var elem = document.createElement('canvas');
+                 return !!(elem.getContext && elem.getContext('2d'));
+             }
+             
+             function Boton(estilo, accion){
+                 this.r = canvasControles.width*0.05;
+                 this.x = this.r+Math.random()*(canvasControles.width-this.r);
+                 this.y = this.r+Math.random()*(canvasControles.height-this.r);
+                 this.vx = Math.random()-0.5;
+                 this.vy = Math.random()-0.5;
+                 this.accion = accion;
+                 this.estilo = estilo;
+             }
+             
+             Boton.prototype = {
+                 mover: function(){
+                     this.x += this.vx;
+                     if(this.x+this.r > canvasControles.width){
+                         this.vx = -this.vx;
+                         this.x = canvasControles.width-this.r;
+                     } else if(this.x-this.r < 0) {
+                         this.vx = -this.vx;
+                         this.x = this.r;
+                     }
+                     this.y += this.vy;
+                     if(this.y+this.r > canvasControles.height){
+                         this.vy = -this.vy;
+                         this.y = canvasControles.height-this.r;
+                     } else if(this.y-this.r < 0){
+                         this.vy = -this.vy;
+                         this.y = -this.r;
+                     }
+                 }
+             }
+             function playMouse(){
+                 if(video.paused){
+                     video.play();
+                 } else {
+                     video.pause();
+                 }
+             }
+             
+             function pintarPlay(ctx){
+                 //fCirculo de fondo
+                 ctx.beginPath();
+                 ctx.arc(this.x, this.y, this.r, 0, Math.PI*2);
+                 ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+                 ctx.closePath();
+                 ctx.fill();
+                 //Dibujo
+                 ctx.beginPath();
+                 if(video.paused){
+                     ctx.moveTo(this.x-this.r/2,this.y-this.r/2);
+                     ctx.lineTo(this.x-this.r/2,this.y-this.r/2);
+                     ctx.lineTo(this.x+this.r/2,this.y);
+                     ctx.lineTo(this.x-this.r/2,this.y-this.r/2);
+                 } else{
+                     ctx.moveTo(this.x-this.r/2,this.y-this.r/2);
+                     ctx.lineTo(this.x-this.r/2,this.y+this.r/2);
+                     ctx.lineTo(this.x-this.r*0.2,this.y+this.r/2);
+                     ctx.lineTo(this.x-this.r*0.2,this.y-this.r/2);
+                     ctx.lineTo(this.x-this.r/2,this.y-this.r/2);
+                     
+                     ctx.moveTo(this.x+this.r/2,this.y-this.r/2);
+                     ctx.lineTo(this.x+this.r/2,this.y+this.r/2);
+                     ctx.lineTo(this.x+this.r*0.2,this.y+this.r/2);
+                     ctx.lineTo(this.x+this.r*0.2,this.y-this.r/2);
+                     ctx.lineTo(this.x+this.r/2,this.y-this.r/2);
+                 }
+                 ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
+                 ctx.closePath();
+                 ctx.fill();
+             }
+             
+             function muted(){
+                 video.muted = !video.muted;
+             }
+             
+             function pintarMute(ctx){
+                  //fCirculo de fondo
+                 ctx.beginPath();
+                 ctx.arc(this.x, this.y, this.r, 0, Math.PI*2);
+                 ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+                 ctx.closePath();
+                 ctx.fill();
+                 //Altavoz
+                 ctx.beginPath();
+                 
+                     ctx.moveTo(this.x-this.r/2, this.y-this.r/4);
+                     ctx.lineTo(this.x-this.r/2, this.y+this.r/4);
+                     ctx.lineTo(this.x, this.y+this.r/4);
+                     ctx.lineTo(this.x+this.r/2, this.y+this.r/2);             
+                     ctx.lineTo(this.x+this.r/2, this.y-this.r/2);
+                     ctx.lineTo(this.x, this.y-this.r/4);
+                     ctx.lineTo(this.x-this.r/2, this.y-this.r/4);
+                     ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
+                     ctx.closePath();
+                     ctx.fill();
+                     // Silencio o no
+                     if(video.muted){
+                            ctx.beginPath();
+                            ctx.moveTo(this.x-this.r/2, this.y-this.r/2);
+                            ctx.lineTo(this.x+this.r/2,this.y+this.r/2);
+                            ctx.strokeStyle = "rgba(255, 50, 50, 0.5)";
+                            ctx.closePath();
+                            ctx.stroke();       
+                     }
+             }
+        </script> 
+         <div>
+            <canvas id="canvasVideo">
+                Tu navegador no soporta el elemento <code>canvas</code> de HTML5.
+            </canvas>
+            <canvas id="canvasControles">
+                
+            </canvas>
+        </div>
+    </body>
+    
+    
+</html>

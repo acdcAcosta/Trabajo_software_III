@@ -1,0 +1,299 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>My Musik</title>
+<style id="inlinecss" type="text/css">
+            /* put a border around the canvas element */
+            #canvas  
+            {
+                margin-top:10px; 
+                border-style:solid; 
+                border-width:1px; 
+                padding:3px; 
+            }
+			#canvasVolumen  
+            {
+                margin-top:10px; 
+                border-style:solid; 
+                border-width:1px; 
+                padding:3px; 
+            }
+        </style>
+<script type="text/javascript">
+
+/*CLASE REPRODUCTOR (padre)
+====================================
+*/
+var reproductor = 
+    { audio: "",
+	  canvas: "",
+	  getAudio: function()
+	    { this.usarAudio("miAudio");
+		  return this.audio;
+		},	
+	  setAudio: function(audio)
+	    { this.accederAudio("");
+		  this.audio = audio;
+		},	
+	  getCanvas: function()
+	    { this.usarCanvas("canvas");
+		  return this.canvas;
+		},	
+	  setCanvas: function(canvas)
+	    { this.usarCanvas("");
+		  this.canvas = canvas;
+		},
+      usarAudio: function(idAudio)
+	    { document.getElementById(idAudio);
+	    },
+	  usarCanvas: function(idCanvas)
+	    { document.getElementById(idCanvas);
+		}
+	};
+
+
+/*CLASE PLAY (hijo)
+====================================
+*/
+var presionarPlay = 
+    { //Declaramos los atributos, para luego modificar por los metodos del propio objeto que se crea a partir de la clase
+	  play: "",
+	  //Aqui se entrega el valor recibido
+	  getPlay: function()
+	     { this.ponerPlay('miAudio', 'play');
+		   return this.play;
+		 },
+	  //Aqui se puede cambiar el valor del atributo
+	  setPlay: function(play)
+	     { this.play = play; 
+		 }, 
+	  //Aqui creamos el metodo para reproducir el audio y a la vez para poner en pausa
+	  ponerPlay: function(recibeAudio, boton) 
+	     { var oAudio = document.getElementById(recibeAudio);
+		   var btn = document.getElementById(boton);
+		   if(oAudio.paused)
+		     { oAudio.play();
+			   btn.textContent = "Pausar";
+			 }
+			else{ oAudio.pause();
+			      btn.textContent = "Reproducir";
+				}
+		  }
+}; 
+/*CLASE BARRA DE PROGRESO
+====================================
+*/
+var barraProgreso = 
+    { barra: "",
+	  getBarra: function()
+	    { this.hacerBarra('miAudio', 'canvas');
+		  this.deslizarBarra('miAudio','canvas');
+		  return this.barra;
+		},
+	  setBarra: function(barra)
+	    { this.barra = barra;
+		},
+	  hacerBarra: function(recibeAudio, idCanvas)
+	    { //
+		  var oAudio = document.getElementById(recibeAudio);
+		  //Aqui acudimos a canvas
+		  var canvas = document.getElementById(idCanvas);
+			
+	      //Creamos una funcion para dibujar la barra de progreso
+		  function dibujarBarraProgreso()
+			  { // hacemos el redondeo del valor de siguimiento de produccion de un audio(hasta llegar al tamaño total de audio)
+				var siguimientoProduccion = Math.round(oAudio.currentTime);
+				//
+				if(canvas.getContext)
+				  { //
+				    var ctx = canvas.getContext("2d");
+			        //Borramos el area de la barra y hacemos que sea totalmente transparente
+					ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
+					ctx.fillStyle = "rgb(255,1,0)";
+					//Aqui controlamos el avance horizontal del barra de progreso.
+					var fWidth = (siguimientoProduccion / oAudio.duration) * (canvas.clientWidth);
+					//document.write(fWidth);
+					if (fWidth > 0) 
+					  { //Aqui dibujamos el barra de progeso con cambio de tamaño horizontal; pero el tamaño vertical es constante
+					    var cts = ctx.fillRect(0, 0, fWidth, canvas.clientHeight);   
+					  }
+				  }       
+		       }
+			//Aqui mostramos la barra de progreso llamando a la funcion dibujarBarra, en otras palabras actualizamos la barra de progreso
+			     oAudio.addEventListener("timeupdate", dibujarBarraProgreso, true);
+		       },
+		  
+       //Creamos un metodo para avanzar o retroceder cancion en reproduccion
+	deslizarBarra: function(recibeAudio, idCanvas)
+	    { var oAudio = document.getElementById(recibeAudio);
+		  
+		  //Aqui acudimos a canvas
+		  var canvas = document.getElementById(idCanvas);
+		  canvas.addEventListener("click",function(e)
+			  { if(!e)
+				  { //Obtiene el último evento de si no es determinado
+					e = window.event;
+				  }
+				try { oAudio.currentTime = oAudio.duration * (e.offsetX / canvas.clientWidth);
+				    }
+				catch (err)
+				      { //Fállele silenciosamente excepto la función en consola de herramientas del desarrollador F12
+						if (window.console && console.error("Error:" + err));
+					  }
+			    },true);
+		},
+	 ponerBarraEnCero: function(miAudio)
+	    { try{ var oAudio = document.getElementById(miAudio);
+               oAudio.currentTime = 0;
+             }
+          catch(e){ if (window.console && console.error("Error:" + e));
+                  }
+	    }
+    };
+	 
+/*CLASE BARRA VOLUMEN 
+====================================
+*/
+var barraVolumen = 
+	{ volumen: "",
+	  getVolumen: function()
+		 { this.hacerBarraVolumen('miAudio','canvasVolumen');
+		   this.deslizarBarraVolumen('miAudio','canvasVolumen');
+		   return this.volumen;
+		 },
+	  setVolumen: function(volumen)
+		 { this.volumen = volumen;
+		 },
+	  hacerBarraVolumen: function(recibeAudio, idCanvas)
+		 { //Acudimos al identificador de audio
+		   var oAudio = document.getElementById(recibeAudio);
+		   //Acudimos al identificador de canvas 
+		   var canvas = document.getElementById(idCanvas);
+		   //Creamos una funcion para dibujar la barra de volumen, en este caso usando canvas
+		   function dibujarBarraVolumen()
+		     { //Verificamos si el navegador soporta canvas
+			   if(canvas.getContext)
+			     { var ctx = canvas.getContext("2d");
+				   //Borramos el area de la barra y hacemos que sea totalmente transparente
+				   ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
+				   //Definimos el color de relleno
+				   ctx.fillStyle = "rgb(23,1,1)";
+				   
+				   var fWidth = (oAudio.volume) * (canvas.clientWidth);
+					if (fWidth > 0) 
+					  { var cts = ctx.fillRect(0, 0, fWidth, canvas.clientHeight);  
+					  }
+				 }
+			 }
+		   oAudio.addEventListener("timeupdate", dibujarBarraVolumen, true);
+		 },
+	  deslizarBarraVolumen: function(recibeAudio, idCanvas)
+		 { var oAudio = document.getElementById(recibeAudio);
+		  
+		  //Aqui acudimos a canvas
+		  var canvas = document.getElementById(idCanvas);
+		  canvas.addEventListener("click",function(e)
+			  { if(!e)
+				  { //Obtiene el último evento de si no es determinado
+					e = window.event;
+				  }
+				try { var newVol = Math.round(e.offsetX / canvas.clientWidth * 100) / 100; 
+				      oAudio.volume=newVol;
+				    }
+				catch (err)
+				      { //Fállele silenciosamente excepto la función en consola de herramientas del desarrollador F12
+						if (window.console && console.error("Error:" + err));
+					  }
+			    },true);
+		 },
+	  aumentarVolumen: function(miAudio)
+	     { try{ var oAudio = document.getElementById(miAudio);
+		        oAudio.volume += 0.1;
+			  }
+			catch(e){ //
+			          if (window.console && console.error("Error:" + e));
+				    }
+		 },
+	  bajarVolumen: function(miAudio)
+	     { try{ var oAudio = document.getElementById(miAudio);
+		        oAudio.volume -=0.1;
+			  }
+			catch(e){
+				    }
+		 }
+	}
+ 
+function inicioPorDefecto()
+   { barraProgreso.getBarra();
+     barraVolumen.getVolumen(); 
+   } 
+//Este acontecimiento queda despedido cuando una página tiene loaded
+window.addEventListener("DOMContentLoaded", inicioPorDefecto, false);
+
+
+function cargarReproductor() {
+   var select = document.getElementById("selectTrack");
+   var path = select.options[0].getAttribute("path");
+
+   nuevo_audio = document.getElementById("miAudio");
+   //nuevo_audio.setAttribute("id","reproductor");
+   nuevo_audio.setAttribute("controls", "controls");     
+      
+   source = document.createElement("source");
+   source.setAttribute("src", path);
+   source.setAttribute("type", "audio/mpeg");
+   source.setAttribute("id", "reproductorSource");
+
+   nuevo_audio.appendChild(source);
+
+   padre = document.getElementById("reproductorBox");
+   padre.appendChild(nuevo_audio);
+}
+
+</script>
+</head>
+
+<body>
+ <audio id="miAudio">
+      <source src="../music/02_mariposas95.mp3" />
+ </audio>
+ <button id="play" onclick="presionarPlay.getPlay()">
+ Play
+ </button>
+ <button id="anteriorC" onclick="">
+ Anterior
+ </button>
+ <button id="siguienteC" onclick="">
+ Siguiente
+ </button>
+  <button id="ponerEnCero" onclick="barraProgreso.ponerBarraEnCero('miAudio')">
+ Volver
+ </button>
+ <button id="bajarV" onclick="barraVolumen.bajarVolumen('miAudio')">
+ -
+ </button>
+ <button id="aumentarV" onclick="barraVolumen.aumentarVolumen('miAudio')">
+ +
+ </button>
+ 
+ <p>
+   <canvas id="canvas" width="500" height="20">
+   </canvas>
+ </p>
+ <p>
+   <canvas id="canvasVolumen" width="200" height="10">
+   </canvas>
+ </p>
+  </div>
+   <select  id = "selectTrack" multiple onChange="cambiarTrack(this.options[this.selectedIndex]);">
+      <option path="music\enomine.mp3">Der Exorzist</option>
+      <option path="music\02 - Lovegame.mp3">Lovegame</option>
+      <option path="music\02_mariposas95.mp3">Mariposas</option>
+      <option path="music\03 - It's My Life.mp3">It's My Life</option>
+      <option path="music\03 - Nickelback - Gotta Be Somebody.mp3">Gotta Be Somebody</option>
+      <option path="music\enomine.mp3">E nomine</option>
+      <option path="music\04. Estoy loco por tu amor.mp3">Estoy loco por tu amor</option>
+   </select>
+</body>
+</html>
